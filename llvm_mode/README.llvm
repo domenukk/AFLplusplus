@@ -84,12 +84,12 @@ Several options are present to make llvm_mode faster or help it rearrange
 the code to make afl-fuzz path discovery easier.
 
 If you need just to instrument specific parts of the code, you can whitelist
-which C/C++ files to actually intrument. See README.whitelist
+which C/C++ files to actually instrument. See README.whitelist
 
 For splitting memcmp, strncmp, etc. please see README.laf-intel
 
 As the original afl llvm_mode implementation has been replaced with
-then much more effective instrim (https://github.com/csienslab/instrim/) 
+the much more effective instrim (https://github.com/csienslab/instrim/) 
 there is an option for optimizing loops. This optimization shows which
 part of the loop has been selected, but not how many time a loop has been
 called in a row (unless its a complex loop and a block inside was
