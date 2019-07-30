@@ -19,7 +19,7 @@
                 "--",
                 "python",
                 "../../../unicorefuzz/harness.py",
-                "-"
+                "@@"
                 ],
             "stopAtEntry": true,
             "cwd": "${workspaceFolder}/unicorn_mode/unicorn",
