@@ -36,7 +36,11 @@
                 {
                     "name": "AFL_DEBUG_CHILD_OUTPUT",
                     "value": "1"
-                }
+                },
+                {
+                    "name": "AFL_COMPCOV_LEVEL",
+                    "value": "2"
+                },
                 /*{
                     "name": "PYTHONPATH",
                     "value": "${workspaceFolder}/unicorn_mode/unicorn/bindings/python"
