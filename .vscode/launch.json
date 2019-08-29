@@ -27,7 +27,6 @@
                 {
                     "name": "LIBUNICORN_PATH",
                     "value": "${workspaceFolder}/unicorn_mode/unicorn"
-<<<<<<< HEAD
                 },
                 {
                     "name": "AFL_BENCH_JUST_ONE",
@@ -36,8 +35,6 @@
                 {
                     "name": "AFL_DEBUG_CHILD_OUTPUT",
                     "value": "1"
-=======
->>>>>>> ab44347cc07c41846610695ea1b98eff088df248
                 }
                 /*{
                     "name": "PYTHONPATH",
