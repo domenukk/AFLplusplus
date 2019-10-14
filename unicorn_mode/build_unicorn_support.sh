@@ -33,8 +33,8 @@
 # You must make sure that Unicorn Engine is not already installed before
 # running this script. If it is, please uninstall it first.
 
-UNICORN_URL="https://github.com/unicorn-engine/unicorn/archive/24f55a7973278f20f0de21b904851d99d4716263.tar.gz"
-UNICORN_SHA384="7180d47ca52c99b4c073a343a2ead91da1a829fdc3809f3ceada5d872e162962eab98873a8bc7971449d5f34f41fdb93"
+UNICORN_URL="https://github.com/unicorn-engine/unicorn/archive/57e3509812f0842b0752bff1e1b3a44ad438271e.tar.gz"
+UNICORN_SHA256="b426a9ef1da5688ec43619f1f2e5c385b0b08e2e66ce5eaa70614bf61684b07e"
 
 echo "================================================="
 echo "Unicorn-AFL build script"
@@ -64,7 +64,7 @@ if [ ! -f "../afl-showmap" ]; then
 
 fi
 
-for i in wget python automake autoconf sha384sum; do
+for i in wget python automake autoconf sha256sum; do
 
   T=`which "$i" 2>/dev/null`
 
@@ -77,18 +77,14 @@ for i in wget python automake autoconf sha384sum; do
 
 done
 
-if ! which easy_install > /dev/null; then
+T=$(which pip 2>/dev/null)
+if [ "$T" = "" ]; then
 
-  # work around for unusual installs
-  if [ '!' -e /usr/lib/python2.7/dist-packages/easy_install.py ]; then
-
-    echo "[-] Error: Python setup-tools not found. Run 'sudo apt-get install python-setuptools'."
+    echo "[-] Error: Could not find pip3. Run 'sudo apt-get install python-pip or python3-pip'"
     exit 1
 
-  fi
-
 fi
-
+ 
 if echo "$CC" | grep -qF /afl-; then
 
   echo "[-] Error: do not use afl-gcc or afl-clang to compile this tool."
@@ -100,19 +96,19 @@ echo "[+] All checks passed!"
 
 ARCHIVE="`basename -- "$UNICORN_URL"`"
 
-CKSUM=`sha384sum -- "$ARCHIVE" 2>/dev/null | cut -d' ' -f1`
+CKSUM=`sha256sum -- "$ARCHIVE" 2>/dev/null | cut -d' ' -f1`
 
-if [ ! "$CKSUM" = "$UNICORN_SHA384" ]; then
+if [ ! "$CKSUM" = "$UNICORN_SHA256" ]; then
 
   echo "[*] Downloading Unicorn v1.0.1 from the web..."
   rm -f "$ARCHIVE"
   wget -O "$ARCHIVE" -- "$UNICORN_URL" || exit 1
 
-  CKSUM=`sha384sum -- "$ARCHIVE" 2>/dev/null | cut -d' ' -f1`
+  CKSUM=`sha256sum -- "$ARCHIVE" 2>/dev/null | cut -d' ' -f1`
 
 fi
 
-if [ "$CKSUM" = "$UNICORN_SHA384" ]; then
+if [ "$CKSUM" = "$UNICORN_SHA256" ]; then
 
   echo "[+] Cryptographic signature on $ARCHIVE checks out."
 
@@ -149,7 +145,7 @@ echo "[+] Configuration complete."
 
 echo "[*] Attempting to build Unicorn (fingers crossed!)..."
 
-UNICORN_QEMU_FLAGS='--python=python2' make -j `nproc` || exit 1
+make -j `nproc` || exit 1
 
 echo "[+] Build process successful!"
 
