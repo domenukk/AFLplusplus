@@ -1185,6 +1185,9 @@ int main(int argc, char** argv) {
   find_binary(argv[optind]);
   detect_file_args(argv + optind, out_file);
 
+  if (unicorn_mode)
+    set_up_unicorn_environment(argv[0])
+
   if (qemu_mode) {
 
     if (use_wine)

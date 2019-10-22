@@ -722,6 +722,9 @@ int main(int argc, char** argv) {
 
   check_binary(argv[optind]);
 
+  if (unicorn_mode)
+    set_up_unicorn_environment(argv[0])
+
   start_time = get_cur_time();
 
   if (qemu_mode) {

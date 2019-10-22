@@ -671,6 +671,9 @@ int main(int argc, char** argv) {
 
   detect_file_args(argv + optind, at_file);
 
+  if (unicorn_mode)
+    set_up_unicorn_environment(argv[0])
+
   if (qemu_mode) {
 
     if (use_wine)

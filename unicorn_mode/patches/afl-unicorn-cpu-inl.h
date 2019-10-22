@@ -58,13 +58,6 @@
 #define AFL_UNICORN_CPU_SNIPPET2          \
   do {                                    \
                                           \
-    if (unlikely(afl_first_instr == 0)) { \
-                                          \
-      afl_setup(env->uc);                 \
-      afl_forkserver(env);                \
-      afl_first_instr = 1;                \
-                                          \
-    }                                     \
     afl_maybe_log(env->uc, tb->pc);       \
                                           \
   } while (0)

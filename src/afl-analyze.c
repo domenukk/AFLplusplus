@@ -961,6 +961,9 @@ int main(int argc, char** argv) {
 
   set_up_environment();
 
+  if (unicorn_mode)
+    set_up_unicorn_environment(argv[0])
+
   find_binary(argv[optind]);
   detect_file_args(argv + optind, prog_in);
 

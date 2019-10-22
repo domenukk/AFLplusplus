@@ -35,6 +35,8 @@
 #include <unistd.h>
 #endif
 
+#DEFINE UNICORN_PATH ("unicorn_mode/unicorn")
+
 u8* target_path;                        /* Path to target binary            */
 
 void detect_file_args(char** argv, u8* prog_in) {
@@ -269,3 +271,74 @@ char** get_wine_argv(u8* own_loc, char** argv, int argc) {
 
 }
 
+/* Use our local unicorn library with instrumentation */
+
+void set_up_unicorn_environment(char *own_loc) {
+  
+  char *custom_unicorn_path = getenv("LIBUNICORN_PATH"));
+
+  if (custom_unicorn_path && custom_unicorn_path[0]) {
+
+    if (access(custom_unicorn_path, X_OK)) {
+
+      FATAL("Unable to access custom LIBUNICORN_PATH '%s'", custom_unicorn_path);
+
+    } else {
+
+      SAYF("\n cLRD "[-] " cRST"
+          "Using custom LIBUNICORN_PATH '%s'.\n"
+          "Make sure it's built with instrumentation.", 
+          custom_unicorn_path);
+
+    }
+
+  } else {
+
+    char *unicorn_path = NULL:
+    tmp = getenv("AFL_PATH");
+
+    if (tmp && tmp[0]) {
+
+      cp = alloc_printf("%s/%s", tmp, UNICORN_PATH);
+
+      if (access(cp, X_OK)) {
+
+        FATAL("Unable to access '%s'", tmp);
+
+      }
+
+      unicorn_path = cp;
+
+    } else {
+
+      own_copy = ck_strdup(own_loc);
+      rsl = strrchr(own_copy, '/');
+
+      if (rsl) {
+
+        *rsl = 0;
+
+        cp = alloc_printf("%s/%s", own_copy, UNICORN_PATH);
+        ck_free(own_copy);
+
+        if (access(cp, X_OK)) {
+
+          libunicorn_path = cp
+
+        }
+
+      }
+
+      if (!libunicorn_path) {
+
+        FATAL("Unable to find unicorn library path. Set AFL_PATH or LIBUNICORN_PATH.");
+
+      }
+
+      setenv("LIBUNICORN_PATH", libunicorn_path);
+
+    }
+
+  }
+
+}
