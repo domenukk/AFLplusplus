@@ -33,6 +33,7 @@ unset AFL_USE_ASAN
 unset AFL_USE_MSAN
 unset AFL_CC
 unset AFL_PRELOAD
+unset AFL_GCC_WHITELIST
 unset AFL_LLVM_WHITELIST
 unset AFL_LLVM_INSTRIM
 unset AFL_LLVM_LAF_SPLIT_SWITCHES
@@ -270,9 +271,9 @@ test -e ../afl-gcc-fast && {
 } || $ECHO "$YELLOW[-] gcc_plugin not compiled, cannot test"
 
 $ECHO "$BLUE[*] Testing: shared library extensions"
-gcc -o test-compcov test-compcov.c > /dev/null 2>&1
+cc -o test-compcov test-compcov.c > /dev/null 2>&1
 test -e ../libtokencap.so && {
-  AFL_TOKEN_FILE=token.out LD_PRELOAD=../libtokencap.so ./test-compcov foobar > /dev/null 2>&1
+  AFL_TOKEN_FILE=token.out LD_PRELOAD=../libtokencap.so DYLD_INSERT_LIBRARIES=../libtokencap.so DYLD_FORCE_FLAT_NAMESPACE=1 ./test-compcov foobar > /dev/null 2>&1
   grep -q BUGMENOT token.out > /dev/null 2>&1 && {
     $ECHO "$GREEN[+] libtokencap did successfully capture tokens"
   } || $ECHO "$RED[!] libtokencap did not capture tokens"
@@ -281,8 +282,8 @@ test -e ../libtokencap.so && {
 test -e ../libdislocator.so && {
   {
     ulimit -c 1
-    # DYLD_INSERT_LIBRARIES is used on Darwin/MacOSX
-    LD_PRELOAD=../libdislocator.so DYLD_INSERT_LIBRARIES=../libdislocator.so ./test-compcov BUFFEROVERFLOW > test.out 2> /dev/null
+    # DYLD_INSERT_LIBRARIES and DYLD_FORCE_FLAT_NAMESPACE is used on Darwin/MacOSX
+    LD_PRELOAD=../libdislocator.so DYLD_INSERT_LIBRARIES=../libdislocator.so DYLD_FORCE_FLAT_NAMESPACE=1 ./test-compcov BUFFEROVERFLOW > test.out 2> /dev/null
   } > /dev/null 2>&1
   grep -q BUFFEROVERFLOW test.out > /dev/null 2>&1 && {
     $ECHO "$RED[!] libdislocator did not detect the memory corruption"
