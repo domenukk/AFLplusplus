@@ -1,11 +1,12 @@
 /*
 
-   american fuzzy lop - extract tokens passed to strcmp / memcmp
+   american fuzzy lop++ - extract tokens passed to strcmp / memcmp
    -------------------------------------------------------------
 
-   Written by Michal Zalewski
+   Originally written by Michal Zalewski
 
    Copyright 2016 Google Inc. All rights reserved.
+   Copyright 2019-2020 AFLplusplus Project. All rights reserved.
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -141,6 +142,9 @@ static void __tokencap_load_mappings(void) {
         if (++__tokencap_ro_cnt == MAX_MAPPINGS) break;
 
       }
+
+      base += size;
+      size = 0;
 
     }
 
@@ -684,6 +688,20 @@ bool strcsequal(const void* s1, const void* s2) {
   if (s1 == s2) { return true; }
   if (!s1 || !s2) { return false; }
   return (strcmp(s1, s2) == 0);
+
+}
+
+/* bcmp/memcmp BSD flavors, similar to CRYPTO_memcmp */
+
+int timingsafe_bcmp(const void* mem1, const void* mem2, size_t len) {
+
+  return bcmp(mem1, mem2, len);
+
+}
+
+int timingsafe_memcmp(const void* mem1, const void* mem2, size_t len) {
+
+  return memcmp(mem1, mem2, len);
 
 }
 

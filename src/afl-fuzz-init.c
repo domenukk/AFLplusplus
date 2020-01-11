@@ -9,7 +9,7 @@
                         Andrea Fioraldi <andreafioraldi@gmail.com>
 
    Copyright 2016, 2017 Google Inc. All rights reserved.
-   Copyright 2019 AFLplusplus Project. All rights reserved.
+   Copyright 2019-2020 AFLplusplus Project. All rights reserved.
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -1905,9 +1905,10 @@ void check_binary(u8* fname) {
 #else
 
 #if !defined(__arm__) && !defined(__arm64__)
-  if ((f_data[0] != 0xCF || f_data[1] != 0xFA || f_data[2] != 0xED) 
-          && (f_data[0] != 0xCA || f_data[1] != 0xFE || f_data[2] != 0xBA))
-    FATAL("Program '%s' is not a 64-bit or universal Mach-O binary", target_path);
+  if ((f_data[0] != 0xCF || f_data[1] != 0xFA || f_data[2] != 0xED) &&
+      (f_data[0] != 0xCA || f_data[1] != 0xFE || f_data[2] != 0xBA))
+    FATAL("Program '%s' is not a 64-bit or universal Mach-O binary",
+          target_path);
 #endif
 
 #endif                                                       /* ^!__APPLE__ */

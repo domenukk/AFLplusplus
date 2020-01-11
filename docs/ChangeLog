@@ -13,9 +13,34 @@ Want to stay in the loop on major new features? Join our mailing list by
 sending a mail to <afl-users+subscribe@googlegroups.com>.
 
 
-----------------------
-Version ++2.58d (dev):
-----------------------
+--------------------------
+Version ++2.60d (develop):
+--------------------------
+
+  - afl-fuzz:
+     - now prints the real python version support compiled in
+  - afl-clang-fast now shows in the help output for which llvm version it
+    was compiled for.
+  - added fix from Debian project to compile libdislocator and libtokencap
+
+
+--------------------------
+Version ++2.60c (release):
+--------------------------
+
+  - fixed a critical bug in afl-tmin that was introduced during ++2.53d
+  - added test cases for afl-cmin and afl-tmin to test/test.sh
+  - added ./experimental/argv_fuzzing ld_preload library by Kjell Braden
+  - added preeny's desock_dup ld_preload library as
+    ./experimental/socket_fuzzing for network fuzzing
+  - added AFL_AS_FORCE_INSTRUMENT environment variable for afl-as - this is
+    for the retrorewrite project
+  - we now set QEMU_SET_ENV from AFL_PRELOAD when qemu_mode is used
+
+
+--------------------------
+Version ++2.59c (release):
+--------------------------
 
   - qbdi_mode: fuzz android native libraries via QBDI framework
   - unicorn_mode: switched to the new unicornafl, thanks domenukk
@@ -42,6 +67,7 @@ Version ++2.58d (dev):
   - added regex.dictionary
   - qemu and unicorn download scripts now try to download until the full
     download succeeded. f*ckin travis fails downloading 40% of the time!
+  - more support for Android (please test!)
   - added the few Android stuff we didnt have already from Google afl repository
   - removed unnecessary warnings
 

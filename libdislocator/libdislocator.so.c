@@ -1,11 +1,12 @@
 /*
 
-   american fuzzy lop - dislocator, an abusive allocator
+   american fuzzy lop++ - dislocator, an abusive allocator
    -----------------------------------------------------
 
-   Written by Michal Zalewski
+   Originally written by Michal Zalewski
 
    Copyright 2016 Google Inc. All rights reserved.
+   Copyright 2019-2020 AFLplusplus Project. All rights reserved.
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -130,7 +131,7 @@ static u8  alloc_verbose,               /* Additional debug messages        */
 static __thread size_t total_mem;       /* Currently allocated mem          */
 
 static __thread u32 call_depth;         /* To avoid recursion via fprintf() */
-static u32 alloc_canary;
+static u32          alloc_canary;
 
 /* This is the main alloc function. It allocates one page more than necessary,
    sets that tailing page to PROT_NONE, and then increments the return address
@@ -348,10 +349,10 @@ int posix_memalign(void** ptr, size_t align, size_t len) {
     return 0;
 
   }
-  
+
   size_t rem = len % align;
   if (rem) len += align - rem;
-  
+
   *ptr = __dislocator_alloc(len);
 
   if (*ptr && len) memset(*ptr, ALLOC_CLOBBER, len);

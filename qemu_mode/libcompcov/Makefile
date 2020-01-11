@@ -1,10 +1,10 @@
 #
-# american fuzzy lop - libcompcov
+# american fuzzy lop++ - libcompcov
 # --------------------------------
 #
 # Written by Andrea Fioraldi <andreafioraldi@gmail.com>
 #
-# Copyright 2019 Andrea Fioraldi. All rights reserved.
+# Copyright 2019-2020 Andrea Fioraldi. All rights reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.

@@ -8,13 +8,13 @@
 //
 
 /*
-   american fuzzy lop - GCC instrumentation pass
+   american fuzzy lop++ - GCC instrumentation pass
    ---------------------------------------------
 
    Written by Austin Seipp <aseipp@pobox.com> with bits from
               Emese Revfy <re.emese@gmail.com>
 
-   Fixed by Heiko Eißfeldt 2019 for AFL++
+   Fixed by Heiko Eißfeldt 2019-2020 for AFL++
 
    GCC integration design is based on the LLVM design, which comes
    from Laszlo Szekeres. Some of the boilerplate code below for

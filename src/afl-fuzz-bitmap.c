@@ -9,7 +9,7 @@
                         Andrea Fioraldi <andreafioraldi@gmail.com>
 
    Copyright 2016, 2017 Google Inc. All rights reserved.
-   Copyright 2019 AFLplusplus Project. All rights reserved.
+   Copyright 2019-2020 AFLplusplus Project. All rights reserved.
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -685,13 +685,14 @@ u8 save_if_interesting(char** argv, void* mem, u32 len, u8 fault) {
       ++unique_crashes;
       if (infoexec) {  // if the user wants to be informed on new crashes - do
 #if !TARGET_OS_IPHONE
-                     // that
+                       // that
         if (system(infoexec) == -1)
           hnb += 0;  // we dont care if system errors, but we dont want a
                      // compiler warning either
 #else
         WARNF("command execution unsupported");
 #endif
+
       }
 
       last_crash_time = get_cur_time();

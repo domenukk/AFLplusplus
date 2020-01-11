@@ -1,5 +1,5 @@
 #
-# american fuzzy lop - LLVM instrumentation
+# american fuzzy lop++ - LLVM instrumentation
 # -----------------------------------------
 #
 # Written by Laszlo Szekeres <lszekeres@google.com> and
@@ -67,7 +67,8 @@ endif
 CFLAGS      ?= -O3 -funroll-loops
 CFLAGS      += -Wall -D_FORTIFY_SOURCE=2 -g -Wno-pointer-sign -I ../include/ \
                -DAFL_PATH=\"$(HELPER_PATH)\" -DBIN_PATH=\"$(BIN_PATH)\" \
-               -DLLVM_BINDIR=\"$(LLVM_BINDIR)\" -DVERSION=\"$(VERSION)\"
+               -DLLVM_BINDIR=\"$(LLVM_BINDIR)\" -DVERSION=\"$(VERSION)\" \
+               -DLLVM_VERSION=\"$(LLVMVER)\"
 ifdef AFL_TRACE_PC
   CFLAGS    += -DUSE_TRACE_PC=1
 endif
@@ -115,7 +116,7 @@ endif
 CLANGVER = $(shell $(CC) --version | sed -E -ne '/^.*version\ ([0-9]\.[0-9]\.[0-9]).*/s//\1/p')
 
 
-ifeq "$(shell echo '\#include <sys/ipc.h>@\#include <sys/shm.h>@int main() { int _id = shmget(IPC_PRIVATE, 65536, IPC_CREAT | IPC_EXCL | 0600); shmctl(_id, IPC_RMID, 0); return 0;}' | tr @ '\n' | $(CC) -x c - -o .test2 2>/dev/null && echo 1 || echo 0 )" "1"
+ifeq "$(shell echo '\#include <sys/ipc.h>@\#include <sys/shm.h>@int main() { int _id = shmget(IPC_PRIVATE, 65536, IPC_CREAT | IPC_EXCL | 0600); shmctl(_id, IPC_RMID, 0); return 0;}' | tr @ '\n' | $(CC) -x c - -o .test2 2>/dev/null && echo 1 || echo 0 ; rm -f .test2 )" "1"
         SHMAT_OK=1
 else
         SHMAT_OK=0
@@ -136,8 +137,8 @@ else
 endif
 
 ifneq "$(CLANGVER)" "$(LLVMVER)"
-  CC = $(shell llvm-config --bindir)/clang
-  CXX = $(shell llvm-config --bindir)/clang++
+  CC = $(shell $(LLVM_CONFIG) --bindir)/clang
+  CXX = $(shell $(LLVM_CONFIG) --bindir)/clang++
 endif
 
 # If prerequisites are not given, warn, do not build anything, and exit with code 0
@@ -261,5 +262,5 @@ vpath  % ..
 	ln -sf afl-clang-fast.8 ../afl-clang-fast++.8
 
 clean:
-	rm -f *.o *.so *~ a.out core core.[1-9][0-9]* .test2 test-instr .test-instr0 .test-instr1 
+	rm -f *.o *.so *~ a.out core core.[1-9][0-9]* .test2 test-instr .test-instr0 .test-instr1 afl-llvm-pass.dwo
 	rm -f $(PROGS) ../afl-clang-fast++ ../afl-clang-fast*.8

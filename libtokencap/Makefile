@@ -1,8 +1,8 @@
 #
-# american fuzzy lop - libtokencap
+# american fuzzy lop++ - libtokencap
 # --------------------------------
 #
-# Written by Michal Zalewski
+# Originally written by Michal Zalewski
 #
 # Copyright 2016 Google Inc. All rights reserved.
 #
@@ -18,8 +18,8 @@ HELPER_PATH  = $(PREFIX)/lib/afl
 
 VERSION     = $(shell grep '^\#define VERSION ' ../config.h | cut -d '"' -f2)
 
-CFLAGS      ?= -O3 -funroll-loops -I ../include/
-CFLAGS      += -Wall -D_FORTIFY_SOURCE=2 -g -Wno-pointer-sign
+CFLAGS      ?= -O3 -funroll-loops
+CFLAGS      += -I ../include/ -Wall -D_FORTIFY_SOURCE=2 -g -Wno-pointer-sign
 
 ifeq "$(shell uname)" "Linux"
   TARGETS = libtokencap.so
@@ -55,6 +55,7 @@ clean:
 	rm -f ../libtokencap.so
 
 install: all
+	install -m 755 -d $${DESTDIR}$(HELPER_PATH)
 	install -m 755 ../libtokencap.so $${DESTDIR}$(HELPER_PATH)
 	install -m 644 README.tokencap.md $${DESTDIR}$(HELPER_PATH)
 

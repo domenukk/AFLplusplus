@@ -14,7 +14,7 @@
 #                                <andreafioraldi@gmail.com>
 #
 # Copyright 2017 Battelle Memorial Institute. All rights reserved.
-# Copyright 2019 AFLplusplus Project. All rights reserved.
+# Copyright 2019-2020 AFLplusplus Project. All rights reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -73,23 +73,23 @@ if [ "$PLT" = "Linux" ]; then
 fi
 
 if [ "$PLT" = "Darwin" ]; then
-  CORES=`sysctl hw.ncpu | cut -d' ' -f2`
+  CORES=`sysctl -n hw.ncpu`
   TARCMD=tar
 fi
 
 if [ "$PLT" = "FreeBSD" ]; then
   MAKECMD=gmake
-  CORES=`sysctl hw.ncpu | cut -d' ' -f2`
+  CORES=`sysctl -n hw.ncpu`
   TARCMD=gtar
 fi
 
 if [ "$PLT" = "NetBSD" ] || [ "$PLT" = "OpenBSD" ]; then
   MAKECMD=gmake
-  CORES=`sysctl hw.ncpu | cut -d'=' -f2`
+  CORES=`sysctl -n hw.ncpu`
   TARCMD=gtar
 fi
 
-for i in wget $PYTHONBIN automake autoconf $MAKECMD $TARCMD; do
+for i in wget $PYTHONBIN automake autoconf git $MAKECMD $TARCMD; do
 
   T=`which "$i" 2>/dev/null`
 
@@ -124,8 +124,10 @@ fi
 echo "[+] All checks passed!"
 
 echo "[*] Making sure unicornafl is checked out"
-git submodule init || exit 1
-git submodule update || exit 1
+rm -rf unicorn # workaround for travis ... sadly ...
+#test -d unicorn && { cd unicorn && { git stash ; git pull ; cd .. ; } }
+test -d unicorn || git clone https://github.com/vanhauser-thc/unicorn
+test -d unicorn || { echo "[-] not checked out, please install git or check your internet connection." ; exit 1 ; }
 echo "[+] Got unicornafl."
 
 echo "[*] making sure config.h matches"

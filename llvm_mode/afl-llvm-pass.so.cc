@@ -1,5 +1,5 @@
 /*
-   american fuzzy lop - LLVM-mode instrumentation pass
+   american fuzzy lop++ - LLVM-mode instrumentation pass
    ---------------------------------------------------
 
    Written by Laszlo Szekeres <lszekeres@google.com> and
@@ -9,6 +9,7 @@
    from afl-as.c are Michal's fault.
 
    Copyright 2015, 2016 Google Inc. All rights reserved.
+   Copyright 2019-2020 AFLplusplus Project. All rights reserved.
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -155,9 +156,14 @@ bool AFLCoverage::runOnModule(Module &M) {
 
   /* Instrument all the things! */
 
+  const char *IntrinsicPrefix = "llvm.";
   int inst_blocks = 0;
 
-  for (auto &F : M)
+  for (auto &F : M) {
+
+    auto Fname = F.getName();
+    if (Fname.startswith(IntrinsicPrefix)) continue;
+
     for (auto &BB : F) {
 
       BasicBlock::iterator IP = BB.getFirstInsertionPt();
@@ -371,6 +377,7 @@ bool AFLCoverage::runOnModule(Module &M) {
       inst_blocks++;
 
     }
+  }
 
   /* Say something nice. */
 

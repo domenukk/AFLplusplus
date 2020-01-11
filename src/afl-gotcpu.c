@@ -1,5 +1,5 @@
 /*
-   american fuzzy lop - free CPU gizmo
+   american fuzzy lop++ - free CPU gizmo
    -----------------------------------
 
    Originally written by Michal Zalewski
@@ -9,7 +9,7 @@
                         Andrea Fioraldi <andreafioraldi@gmail.com>
 
    Copyright 2016, 2017 Google Inc. All rights reserved.
-   Copyright 2019 AFLplusplus Project. All rights reserved.
+   Copyright 2019-2020 AFLplusplus Project. All rights reserved.
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -212,7 +212,7 @@ int main(int argc, char** argv) {
 
       if (util_perc < 110) {
 
-        SAYF("    Core #%u: " cLGN "AVAILABLE\n" cRST, i);
+        SAYF("    Core #%u: " cLGN "AVAILABLE" cRST "(%u%%)\n", i, util_perc);
         exit(0);
 
       } else if (util_perc < 250) {

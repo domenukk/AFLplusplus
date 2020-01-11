@@ -1,8 +1,8 @@
 #
-# american fuzzy lop - makefile
+# american fuzzy lop++ - makefile
 # -----------------------------
 #
-# Written by Michal Zalewski
+# Originally written by Michal Zalewski
 # 
 # Copyright 2013, 2014, 2015, 2016, 2017 Google Inc. All rights reserved.
 # 
@@ -104,9 +104,9 @@ endif
 COMM_HDR    = include/alloc-inl.h include/config.h include/debug.h include/types.h
 
 
-ifeq "$(shell echo '\#include <Python.h>@int main() {return 0; }' | tr @ '\n' | $(CC) -x c - -o .test -I$(PYTHON_INCLUDE) $(LDFLAGS) $(PYTHON_LIB) 2>/dev/null && echo 1 || echo 0 )" "1"
+ifeq "$(shell echo '\#include <Python.h>@int main() {return 0; }' | tr @ '\n' | $(CC) -x c - -o .test -I$(PYTHON_INCLUDE) $(LDFLAGS) $(PYTHON_LIB) 2>/dev/null && echo 1 || echo 0 ; rm -f .test )" "1"
 	PYTHON_OK=1
-	PYFLAGS=-DUSE_PYTHON -I$(PYTHON_INCLUDE) $(LDFLAGS) $(PYTHON_LIB)
+	PYFLAGS=-DUSE_PYTHON -I$(PYTHON_INCLUDE) $(LDFLAGS) $(PYTHON_LIB) -DPYTHON_VERSION=\"$(PYTHON_VERSION)\"
 else
 	PYTHON_OK=0
 	PYFLAGS=
@@ -122,7 +122,7 @@ ifdef STATIC
   LDFLAGS += -lm -lrt -lpthread -lz -lutil
 endif
 
-ifeq "$(shell echo '\#include <sys/ipc.h>@\#include <sys/shm.h>@int main() { int _id = shmget(IPC_PRIVATE, 65536, IPC_CREAT | IPC_EXCL | 0600); shmctl(_id, IPC_RMID, 0); return 0;}' | tr @ '\n' | $(CC) -x c - -o .test2 2>/dev/null && echo 1 || echo 0 )" "1"
+ifeq "$(shell echo '\#include <sys/ipc.h>@\#include <sys/shm.h>@int main() { int _id = shmget(IPC_PRIVATE, 65536, IPC_CREAT | IPC_EXCL | 0600); shmctl(_id, IPC_RMID, 0); return 0;}' | tr @ '\n' | $(CC) -x c - -o .test2 2>/dev/null && echo 1 || echo 0 ; rm -f .test2 )" "1"
 	SHMAT_OK=1
 else
 	SHMAT_OK=0
@@ -145,6 +145,7 @@ man:    $(MANPAGES)
 
 tests:	source-only
 	@cd test ; ./test.sh
+	@rm -f test/errors
 
 performance-tests:	performance-test
 test-performance:	performance-test
@@ -274,10 +275,14 @@ code-format:
 	./.custom-format.py -i gcc_plugin/*.c
 	#./.custom-format.py -i gcc_plugin/*.h
 	./.custom-format.py -i gcc_plugin/*.cc
+	./.custom-format.py -i experimental/*/*.c
+	./.custom-format.py -i experimental/*/*.h
 	./.custom-format.py -i qemu_mode/patches/*.h
 	./.custom-format.py -i qemu_mode/libcompcov/*.c
 	./.custom-format.py -i qemu_mode/libcompcov/*.cc
 	./.custom-format.py -i qemu_mode/libcompcov/*.h
+	./.custom-format.py -i qbdi_mode/*.c
+	./.custom-format.py -i qbdi_mode/*.cpp
 	./.custom-format.py -i *.h
 	./.custom-format.py -i *.c
 
@@ -310,28 +315,34 @@ all_done: test_build
 .NOTPARALLEL: clean
 
 clean:
-	rm -f $(PROGS) libradamsa.so afl-as as afl-g++ afl-clang afl-clang++ *.o src/*.o *~ a.out core core.[1-9][0-9]* *.stackdump .test .test1 .test2 test-instr .test-instr0 .test-instr1 qemu_mode/qemu-3.1.1.tar.xz afl-qemu-trace afl-gcc-fast afl-gcc-pass.so afl-gcc-rt.o afl-g++-fast *.so *.8
+	rm -f $(PROGS) libradamsa.so afl-fuzz-document afl-as as afl-g++ afl-clang afl-clang++ *.o src/*.o *~ a.out core core.[1-9][0-9]* *.stackdump .test .test1 .test2 test-instr .test-instr0 .test-instr1 qemu_mode/qemu-3.1.1.tar.xz afl-qemu-trace afl-gcc-fast afl-gcc-pass.so afl-gcc-rt.o afl-g++-fast *.so *.8
 	rm -rf out_dir qemu_mode/qemu-3.1.1 *.dSYM */*.dSYM
 	-$(MAKE) -C llvm_mode clean
 	-$(MAKE) -C gcc_plugin clean
 	$(MAKE) -C libdislocator clean
 	$(MAKE) -C libtokencap clean
+	$(MAKE) -C experimental/socket_fuzzing clean
+	$(MAKE) -C experimental/argv_fuzzing clean
 	$(MAKE) -C qemu_mode/unsigaction clean
 	$(MAKE) -C qemu_mode/libcompcov clean
 	$(MAKE) -C src/third_party/libradamsa/ clean
-	$(MAKE) -C unicorn_mode/unicorn clean
+	-rm -rf unicorn_mode/unicorn
 
 distrib: all radamsa
 	-$(MAKE) -C llvm_mode
 	-$(MAKE) -C gcc_plugin
 	$(MAKE) -C libdislocator
 	$(MAKE) -C libtokencap
+	$(MAKE) -C experimental/socket_fuzzing
+	$(MAKE) -C experimental/argv_fuzzing
 	cd qemu_mode && sh ./build_qemu_support.sh
 	cd unicorn_mode && sh ./build_unicorn_support.sh
 
 binary-only: all radamsa
 	$(MAKE) -C libdislocator
 	$(MAKE) -C libtokencap
+	$(MAKE) -C experimental/socket_fuzzing
+	$(MAKE) -C experimental/argv_fuzzing
 	cd qemu_mode && sh ./build_qemu_support.sh
 	cd unicorn_mode && sh ./build_unicorn_support.sh
 
@@ -361,7 +372,7 @@ source-only: all radamsa
 	@echo Apache License Version 2.0, January 2004 >> $@
 
 install: all $(MANPAGES)
-	mkdir -p -m 755 $${DESTDIR}$(BIN_PATH) $${DESTDIR}$(HELPER_PATH) $${DESTDIR}$(DOC_PATH) $${DESTDIR}$(MISC_PATH)
+	install -d -m 755 $${DESTDIR}$(BIN_PATH) $${DESTDIR}$(HELPER_PATH) $${DESTDIR}$(DOC_PATH) $${DESTDIR}$(MISC_PATH)
 	rm -f $${DESTDIR}$(BIN_PATH)/afl-plot.sh
 	install -m 755 $(PROGS) $(SH_PROGS) $${DESTDIR}$(BIN_PATH)
 	rm -f $${DESTDIR}$(BIN_PATH)/afl-as
@@ -382,12 +393,14 @@ endif
 	if [ -f libcompcov.so ]; then set -e; install -m 755 libcompcov.so $${DESTDIR}$(HELPER_PATH); fi
 	if [ -f libradamsa.so ]; then set -e; install -m 755 libradamsa.so $${DESTDIR}$(HELPER_PATH); fi
 	if [ -f afl-fuzz-document ]; then set -e; install -m 755 afl-fuzz-document $${DESTDIR}$(BIN_PATH); fi
+	$(MAKE) -C experimental/socket_fuzzing install
+	$(MAKE) -C experimental/argv_fuzzing install
 
 	set -e; ln -sf afl-gcc $${DESTDIR}$(BIN_PATH)/afl-g++
 	set -e; if [ -f afl-clang-fast ] ; then ln -sf afl-clang-fast $${DESTDIR}$(BIN_PATH)/afl-clang ; ln -sf afl-clang-fast $${DESTDIR}$(BIN_PATH)/afl-clang++ ; else ln -sf afl-gcc $${DESTDIR}$(BIN_PATH)/afl-clang ; ln -sf afl-gcc $${DESTDIR}$(BIN_PATH)/afl-clang++; fi
 
 	mkdir -m 0755 -p ${DESTDIR}$(MAN_PATH)
-	install -m0644 -D *.8 ${DESTDIR}$(MAN_PATH)
+	install -m0644 *.8 ${DESTDIR}$(MAN_PATH)
 
 	install -m 755 afl-as $${DESTDIR}$(HELPER_PATH)
 	ln -sf afl-as $${DESTDIR}$(HELPER_PATH)/as
