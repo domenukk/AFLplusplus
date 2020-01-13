@@ -8,6 +8,7 @@
  * puts user data there.
  *
  * Written by Nathan Voss <njvoss99@gmail.com>
+ * Adapted by Lukas Seidel <seidel.1@campus.tu-berlin.de>
  */
 
 
