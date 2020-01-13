@@ -10,11 +10,13 @@
  * Written by Nathan Voss <njvoss99@gmail.com>
  */
 
-// Magic address where mutated data will be placed
-#define DATA_ADDRESS 	0x00300000
 
-int main(void) {
-  unsigned char *data_buf = (unsigned char *) DATA_ADDRESS;
+int main(int argc, char** argv) {
+  if(argc < 2){
+     return -1;
+  }
+
+  char *data_buf = argv[1];
 
   if (data_buf[20] != 0) {
     // Cause an 'invalid read' crash if data[0..3] == '\x01\x02\x03\x04'

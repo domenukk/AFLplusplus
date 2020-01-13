@@ -1,16 +1,17 @@
-# Unicorn Engine
-# By Nguyen Anh Quynh <aquynh@gmail.com>, 2015
+# UnicornAFL Usage
+# Original Unicorn Example Makefile by Nguyen Anh Quynh <aquynh@gmail.com>, 2015
+# Adapted for AFL++ by domenukk <domenukk@gmail.com>, 2020
 
 UNAME_S := $(shell uname -s)
 
-LIBDIR = ../../unicorn
+LIBDIR = ../../unicornafl
 BIN_EXT =
 AR_EXT = a
 
 # Verbose output?
 V ?= 0
 
-CFLAGS += -Wall -Werror -I../../unicorn/include
+CFLAGS += -Wall -Werror -I../../unicornafl/include
 
 LDFLAGS += -L$(LIBDIR) -lpthread -lm
 ifeq ($(UNAME_S), Linux)
@@ -28,14 +29,14 @@ all: harness
 clean:		
 	rm -rf *.o harness harness-debug
 
-harness.o: harness.c ../../unicorn/include/unicorn/*.h
+harness.o: harness.c ../../unicornafl/include/unicorn/*.h
 	${CC} ${CFLAGS} -O3 -c $<
 
-harness-debug.o: harness.c ../../unicorn/include/unicorn/*.h
+harness-debug.o: harness.c ../../unicornafl/include/unicorn/*.h
 	${CC} ${CFLAGS} -g -c $< -o $@
 
 harness: harness.o
-	${CC} -L${LIBDIR} $< ../../unicorn/libunicornafl.a $(LDFLAGS) -o $@
+	${CC} -L${LIBDIR} $< ../../unicornafl/libunicornafl.a $(LDFLAGS) -o $@
 
 debug: harness-debug.o
-	${CC} -L${LIBDIR} $< ../../unicorn/libunicornafl.a $(LDFLAGS) -o harness-debug
+	${CC} -L${LIBDIR} $< ../../unicornafl/libunicornafl.a $(LDFLAGS) -o harness-debug
